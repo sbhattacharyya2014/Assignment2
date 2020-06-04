@@ -29,17 +29,21 @@ public class MovieDAOImp {
 
 	public void addRating(Rating rating) {
 		ratingRepository.save(rating);
+		//Update average movie rating
 		List<Rating> movieRatings = ratingRepository.findByMovieId(rating.getMovieId());
 		double avgMovieRating = movieRatings.stream().mapToInt(Rating::getRating).average().getAsDouble();
 		Movie mov = movieRepository.findByMovieId(rating.getMovieId());
 		mov.setAverageRating(avgMovieRating);
 		movieRepository.save(mov);
+		
+		//Update average Customer rating
 		List<Rating> customerRatings = ratingRepository.findByCustomerId(rating.getCustomerId());
-
 		double avgCustomerRating = customerRatings.stream().mapToInt(Rating::getRating).average().getAsDouble();
 		Customer cust = customerRepository.findByCustomerId(rating.getCustomerId());
 		cust.setCustomerAverageRating(avgCustomerRating);
 		customerRepository.save(cust);
+		
+		//Update combined average rating
 		List<Customer> allCustomers = customerRepository.findAll();
 		double combinedAvgRating = allCustomers.stream().mapToDouble(Customer::getCustomerAverageRating).average()
 				.getAsDouble();
